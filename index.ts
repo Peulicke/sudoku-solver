@@ -83,11 +83,8 @@ const loadBoard = (s: string) => {
 };
 
 const allDifferent = (array: number[]) => {
-    const numbers = new Set();
-    array.forEach(n => {
-        numbers.add(n);
-    });
-    return range(9).every(n => numbers.has(n));
+    const set = new Set(array);
+    return range(9).every(n => set.has(n));
 };
 
 const isValidSolution = (array: number[][]) =>
