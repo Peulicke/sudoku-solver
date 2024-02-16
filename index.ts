@@ -34,23 +34,6 @@ const stacks: Vec3[][] = range(9)
 
 const allPatterns = [...rows, ...cols, ...squares, ...stacks];
 
-const boardToProbabilityString = () =>
-    range(9)
-        .map(i =>
-            range(3)
-                .map(a =>
-                    range(9)
-                        .map(j =>
-                            range(3)
-                                .map(b => (board[i][j][3 * a + b] * 100).toFixed(0))
-                                .join("\t")
-                        )
-                        .join("\t\t")
-                )
-                .join("\n")
-        )
-        .join("\n\n");
-
 const getMostProbableValue = (i: number, j: number) =>
     board[i][j].map((p, n) => [p, n]).sort((a, b) => b[0] - a[0])[0][1];
 
