@@ -4,6 +4,36 @@ const sum = (array: number[]) => array.reduce((s, v) => s + v, 0);
 
 const board = range(9).map(() => range(9).map(() => range(9).map(() => 1 / 9)));
 
+type Vec3 = [number, number, number];
+
+const rows: Vec3[][] = range(9)
+    .map(n => range(9).map(i => range(9).map((j): Vec3 => [i, j, n])))
+    .flat();
+
+const cols: Vec3[][] = range(9)
+    .map(n => range(9).map(j => range(9).map((i): Vec3 => [i, j, n])))
+    .flat();
+
+const squares: Vec3[][] = range(9)
+    .map(n =>
+        range(3)
+            .map(ii =>
+                range(3).map(jj =>
+                    range(3)
+                        .map(a => range(3).map((b): Vec3 => [3 * ii + a, 3 * jj + b, n]))
+                        .flat()
+                )
+            )
+            .flat()
+    )
+    .flat();
+
+const stacks: Vec3[][] = range(9)
+    .map(i => range(9).map(j => range(9).map((n): Vec3 => [i, j, n])))
+    .flat();
+
+const allPatterns = [...rows, ...cols, ...squares, ...stacks];
+
 const boardToProbabilityString = () =>
     range(9)
         .map(i =>
@@ -47,58 +77,10 @@ const setNumber = (i: number, j: number, n: number) => {
     board[i][j][n] = 1;
 };
 
-const normalizeCell = (i: number, j: number) => {
-    const s = sum(board[i][j]);
-    range(9).forEach(n => {
-        board[i][j][n] /= s;
-    });
-};
-
-const normalizeRow = (i: number, n: number) => {
-    const s = sum(board[i].map(cell => cell[n]));
-    range(9).forEach(j => {
-        board[i][j][n] /= s;
-    });
-};
-
-const normalizeCol = (j: number, n: number) => {
-    const s = sum(board.map(row => row[j][n]));
-    range(9).forEach(i => {
-        board[i][j][n] /= s;
-    });
-};
-
-const normalizeSquare = (ii: number, jj: number, n: number) => {
-    const s = sum(
-        range(3)
-            .map(a => range(3).map(b => board[3 * ii + a][3 * jj + b][n]))
-            .flat()
-    );
-    range(3).forEach(a => {
-        range(3).forEach(b => {
-            board[3 * ii + a][3 * jj + b][n] /= s;
-        });
-    });
-};
-
-const normalize = () => {
-    range(9).forEach(a => {
-        range(9).forEach(n => {
-            normalizeRow(a, n);
-            normalizeCol(a, n);
-        });
-    });
-    range(3).forEach(a => {
-        range(3).forEach(b => {
-            range(9).forEach(n => {
-                normalizeSquare(a, b, n);
-            });
-        });
-    });
-    range(9).forEach(a => {
-        range(9).forEach(b => {
-            normalizeCell(a, b);
-        });
+const normalize = (list: Vec3[]) => {
+    const s = sum(list.map(v => board[v[0]][v[1]][v[2]]));
+    list.forEach(v => {
+        board[v[0]][v[1]][v[2]] /= s;
     });
 };
 
@@ -157,7 +139,7 @@ loadBoard(input);
 for (let i = 0; !isValidSolution(boardToSolutionArray()); ++i) {
     console.clear();
     console.log("Iterations: " + i);
-    normalize();
+    allPatterns.forEach(normalize);
 }
 
 console.log(boardToSolutionString());
