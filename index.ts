@@ -4,6 +4,8 @@ const sum = (array: number[]) => array.reduce((s, v) => s + v, 0);
 
 const board = range(9).map(() => range(9).map(() => range(9).map(() => 1 / 9)));
 
+type Vec2 = [number, number];
+
 type Vec3 = [number, number, number];
 
 const rows: Vec3[][] = range(9)
@@ -33,6 +35,8 @@ const stacks: Vec3[][] = range(9)
     .flat();
 
 const allPatterns = [...rows, ...cols, ...squares, ...stacks];
+
+const allFlatPatterns: Vec2[][] = [...rows, ...cols, ...squares].map(list => list.map((v): Vec2 => [v[0], v[1]]));
 
 const getMostProbableValue = (i: number, j: number) =>
     board[i][j].map((p, n) => [p, n]).sort((a, b) => b[0] - a[0])[0][1];
@@ -78,7 +82,7 @@ const loadBoard = (s: string) => {
         });
 };
 
-const isValidRow = (array: number[]) => {
+const allDifferent = (array: number[]) => {
     const numbers = new Set();
     array.forEach(n => {
         numbers.add(n);
@@ -87,23 +91,7 @@ const isValidRow = (array: number[]) => {
 };
 
 const isValidSolution = (array: number[][]) =>
-    array.every(isValidRow) &&
-    range(9).every(i => isValidRow(array[i])) &&
-    range(3).every(i =>
-        range(3).every(j =>
-            isValidRow([
-                array[3 * i][3 * j],
-                array[3 * i][3 * j + 1],
-                array[3 * i][3 * j + 2],
-                array[3 * i + 1][3 * j],
-                array[3 * i + 1][3 * j + 1],
-                array[3 * i + 1][3 * j + 2],
-                array[3 * i + 2][3 * j],
-                array[3 * i + 2][3 * j + 1],
-                array[3 * i + 2][3 * j + 2]
-            ])
-        )
-    );
+    allFlatPatterns.every(list => allDifferent(list.map(v => array[v[0]][v[1]])));
 
 const input = `
 5.8.36...
